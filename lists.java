@@ -1,52 +1,59 @@
 import java.util.PriorityQueue;
 import java.util.Random;
 
-public class OptimalMerge {
-
-  
-    public static int optimalMerge(int[] listSizes) {
+public class MergeSequenceTest {
+    public static int mergeSequence(int[] sizes) {
        
-        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
-        
-        for (int size : listSizes) {
-            minHeap.add(size);
+        PriorityQueue<Integer> heap = new PriorityQueue<>();
+       
+        for (int size : sizes) {
+            heap.add(size);
         }
+
         int totalCost = 0;
-        while (minHeap.size() > 1) {
-    
-            int first = minHeap.poll();  
-            int second = minHeap.poll(); 
+
+        // Process n-1 merges
+        while (heap.size() > 1) {
+            // Remove two smallest elements (log n time per removal)
+            int first = heap.poll();
+            int second = heap.poll();
+
+            // Merge them, and add the resulting size back to the heap (log n time)
             int mergedSize = first + second;
-            minHeap.add(mergedSize);
+            heap.add(mergedSize);
+
+            // Add the merged size to the total cost
             totalCost += mergedSize;
         }
-        return totalCost; 
+
+        // Return the total merge cost
+        return totalCost;
+    }
+
+    public static int[] generateRandomArray(int n) {
+        Random random = new Random();
+        int[] array = new int[n];
+        for (int i = 0; i < n; i++) {
+            array[i] = random.nextInt(1000) + 1; // Generate random integers between 1 and 1000
+        }
+        return array;
     }
 
     public static void main(String[] args) {
-       
-        int[] arraySizes = {100, 1000, 10000, 100000, 1000000};
-        Random rand = new Random(); 
+        int[] testSizes = {100, 1000, 10000, 100000, 1000000};
 
-        // Iterate through the different array sizes
-        for (int n : arraySizes) {
-            // Create an array of size n with random sizes for merging
-            int[] listSizes = new int[n];
-            for (int i = 0; i < n; i++) {
-                listSizes[i] = rand.nextInt(100) + 1; // Random size between 1 and 100
-            }
+        for (int n : testSizes) {
+            int[] listSizes = generateRandomArray(n);
 
-            // Measure execution time
-            long startTime = System.nanoTime();
-            int totalCost = optimalMerge(listSizes);
-            long endTime = System.nanoTime();
+            // Measure the execution time
+            long startTime = System.currentTimeMillis();
+            int totalCost = mergeSequence(listSizes);
+            long endTime = System.currentTimeMillis();
 
-            // Calculate duration in nanoseconds
-            long duration = endTime - startTime;
+            // Convert time to seconds
+            double timeInSeconds = (endTime - startTime) / 1000.0;
 
-            // Print the results
-            System.out.println("Total cost of merging " + n + " lists: " + totalCost + "M");
-            System.out.println("Execution time for " + n + " lists: " + duration + " nanoseconds");
+            System.out.println("n = " + n + ": Total merge cost = " + totalCost + ", Time = " + timeInSeconds + " seconds");
         }
     }
 }
